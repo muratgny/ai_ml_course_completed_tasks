@@ -54,9 +54,11 @@ def generate_lucky_list():
     return random.sample(range(101), 9)  # Generates 9 unique random integers between 0 and 100
 
 
+#Generate Lucky Number and Add It to Lucky List
 def generate_lucky_number(lucky_list):
     lucky_number = random.randint(0, 100)
-    lucky_list.append(lucky_number)
+    insert_index = random.randint(0, len(lucky_list))  # Get a random index
+    lucky_list.insert(insert_index, lucky_number)  # Insert at random index
     return lucky_number
 
 
@@ -72,17 +74,6 @@ def get_player_input(lucky_list):
         except ValueError:
             print("Invalid input! Please enter a number.")
 
-def generate_shorter_lucky_list(lucky_list, lucky_number, player_input, shorter_lucky_list=None):
-    # If this is the first wrong guess, create the shorter lucky list
-    if shorter_lucky_list is None:
-        shorter_lucky_list = [num for num in lucky_list if lucky_number - 10 <= num <= lucky_number + 10]
-    
-    # If player's guess is in the list, remove it
-    if player_input in shorter_lucky_list:
-        shorter_lucky_list.remove(player_input)
-    
-    return shorter_lucky_list
-
 
 def ask_new_guess(shorter_lucky_list, tries_count):
     print(f"This is try#{tries_count} and new list is: {shorter_lucky_list}, choose the lucky number?")
@@ -95,8 +86,8 @@ def handle_correct_guess(tries_count):
     play_again = input("Do you like to play again? (y: Yes, n: NO): ").lower()
     return play_again == 'y'  # Returns True if the player wants to restart
 
-#todo - error is here
-def update_shorter_lucky_list(lucky_list, shorter_lucky_list, lucky_number, player_input):
+
+def create_or_update_shorter_lucky_list(lucky_list, shorter_lucky_list, lucky_number, player_input):
     # If this is the first wrong guess, create a shorter lucky list
     if shorter_lucky_list is None:
         shorter_lucky_list = [num for num in lucky_list if lucky_number - 40 <= num <= lucky_number + 40]
@@ -124,14 +115,17 @@ def main():
         while True:
 
             if player_input == lucky_number:
-                if handle_correct_guess(tries_count):  
-                    break  # Restart game loop
-                else:
+                play_again = handle_correct_guess()
+                
+                if not play_again:
                     print("Thanks for playing!")
                     return  # Exit game
+                
+                break  # Restart game loop
 
-            # If wrong guess, generate or update the shorter lucky list
-            shorter_lucky_list = update_shorter_lucky_list(lucky_list, shorter_lucky_list, lucky_number, player_input)
+
+            # If wrong guess, create or update the shorter lucky list
+            shorter_lucky_list = create_or_update_shorter_lucky_list(lucky_list, shorter_lucky_list, lucky_number, player_input)
 
                     # If only 2 numbers are left, game over
             if len(shorter_lucky_list) <= 2:

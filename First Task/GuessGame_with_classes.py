@@ -2,11 +2,13 @@ import random
 from datetime import datetime
 
 class Player:
+    
     def __init__(self):
         self.name = self.get_player_name()
         self.birthdate, self.age = self.check_age()
 
     def get_player_name(self):
+
         while True:
             player_name = input("Please enter your full name (First Name Last Name): ")
             if player_name.replace(" ", "").isalpha() and player_name.count(" ") == 1:
@@ -15,8 +17,10 @@ class Player:
                 print("Invalid input! Please enter a valid name with only one space and no numbers.")
 
     def get_player_birthdate(self):
+
         while True:
-            player_birthdate = input("Please enter your birthdate (yyyymmdd): ")
+            player_birthdate = input("Please enter your birthdate in yyyymmdd format : ")
+
             if len(player_birthdate) == 8 and player_birthdate.isdigit():
                 year = int(player_birthdate[:4])
                 month = int(player_birthdate[4:6])
@@ -34,6 +38,7 @@ class Player:
         month = int(player_birthdate[4:6])
         day = int(player_birthdate[6:])
         birthdate = datetime(year, month, day)
+
         age = current_year - birthdate.year - ((datetime(current_year, month, day) < birthdate) and 1)
         return age
 
@@ -44,7 +49,7 @@ class Player:
             if player_age >= 18:
                 return player_birthdate, player_age
             else:
-                print(f"Sorry, you're under 18 years old! Your age is {player_age}. Please enter a valid birthdate again.")
+                print(f"Sorry, you are under 18! Your age is {player_age}. Please enter a valid birthdate again.")
 
 
 class LuckyNumberGame:
@@ -58,8 +63,10 @@ class LuckyNumberGame:
         return random.sample(range(101), 9)
 
     def generate_lucky_number(self):
+        """Generates a lucky number and inserts it at a random position in the lucky list."""
         lucky_number = random.randint(0, 100)
-        self.lucky_list.append(lucky_number)
+        insert_index = random.randint(0, len(self.lucky_list))  # Get a random index
+        self.lucky_list.insert(insert_index, lucky_number)  # Insert at random index
         return lucky_number
 
     def get_player_input(self):
@@ -74,7 +81,7 @@ class LuckyNumberGame:
             except ValueError:
                 print("Invalid input! Please enter a number.")
 
-    def update_shorter_lucky_list(self, player_input):
+    def create_or_update_shorter_lucky_list(self, player_input):
         if self.shorter_lucky_list is None:
             self.shorter_lucky_list = [num for num in self.lucky_list if self.lucky_number - 40 <= num <= self.lucky_number + 40]
             return self.shorter_lucky_list
@@ -103,13 +110,15 @@ def main():
 
         while True:
             if player_input == game.lucky_number:
-                if game.handle_correct_guess():
-                    break  # Restart game loop
-                else:
+                play_again = game.handle_correct_guess()
+                
+                if not play_again:
                     print("Thanks for playing!")
                     return  # Exit game
+                
+                break  # Restart game loop
 
-            game.shorter_lucky_list = game.update_shorter_lucky_list(player_input)
+            game.shorter_lucky_list = game.create_or_update_shorter_lucky_list(player_input)
 
             if len(game.shorter_lucky_list) <= 2:
                 print("Game over! No more valid guesses left.")
